@@ -26,7 +26,7 @@ function App() {
   const [managedGenres, setManagedGenres] = useState<Genre[]>([]);
   const [pathname, setPathname] = useState(() => window.location.pathname);
   const user = session?.user || null; const adminAllowed = user?.role === "admin";
-  const navigateTo = (section: typeof activeSection) => { setActiveSection(section); document.getElementById(section === "dashboard" ? "dashboard-section" : section === "content" ? "content-section" : "subscribers-section")?.scrollIntoView({ behavior: "smooth", block: "start" }); };
+  const navigateTo = (section: typeof activeSection) => { setActiveSection(section); window.scrollTo({ top: 0, behavior: "smooth" }); };
 
   const loadContent = async () => { try { const dramas = await apiRequest<Drama[]>("/api/dramas", {}, session?.accessToken); setEpisodes(dramas.map(toEpisode)); } catch (error) { setMessage(error instanceof Error ? error.message : "Unable to load content."); } };
   const loadGenres = async () => { try { setManagedGenres(await apiRequest<Genre[]>("/api/genres")); } catch (error) { setMessage(error instanceof Error ? error.message : "Unable to load genres."); } };
@@ -51,7 +51,7 @@ function App() {
   const dramaMatch = pathname.match(/^\/drama\/([^/]+)\/?$/);
   if (dramaMatch) return <DramaPage dramaId={decodeURIComponent(dramaMatch[1])} accessToken={session?.accessToken} onBack={() => { window.history.pushState({}, "", "/"); setPathname("/"); }} />;
   if (!adminAllowed) return <CustomerAccessGate user={user} accessToken={session!.accessToken} onLogout={handleLogout} />;
-  return <div className="app-shell"><Sidebar activeSection={activeSection} onNavigate={navigateTo} pendingCount={pendingSubscribers.length} userEmail={user.email} onLogout={handleLogout} /><main className="dashboard"><DashboardHeader userEmail={user.email} />{message && <div className="success-box">{message}</div>}<StatsGrid totalContent={episodes.length} published={episodes.filter((episode) => episode.isPublished).length} pendingSubscribers={pendingSubscribers.length} activeSubscribers={activeSubscribers.length} /><ContentSection episodes={episodes} genres={managedGenres.map((genre) => genre.name)} onGenreChange={handleGenreChange} onAddDrama={handleAddDrama} onDeleteDrama={handleDeleteDrama} onCreateGenre={handleCreateGenre} /><SubscriberSection subscribers={subscribers} pendingCount={pendingSubscribers.length} actionId={subscriberActionId} onDecision={handleSubscriberDecision} formatTimestamp={formatTimestamp} /></main></div>;
+  return <div className="app-shell"><Sidebar activeSection={activeSection} onNavigate={navigateTo} pendingCount={pendingSubscribers.length} userEmail={user.email} onLogout={handleLogout} /><main className="dashboard"><DashboardHeader userEmail={user.email} />{message && <div className="success-box">{message}</div>}{activeSection === "dashboard" && <StatsGrid totalContent={episodes.length} published={episodes.filter((episode) => episode.isPublished).length} pendingSubscribers={pendingSubscribers.length} activeSubscribers={activeSubscribers.length} />}{activeSection === "content" && <ContentSection episodes={episodes} genres={managedGenres.map((genre) => genre.name)} onGenreChange={handleGenreChange} onAddDrama={handleAddDrama} onDeleteDrama={handleDeleteDrama} onCreateGenre={handleCreateGenre} />}{activeSection === "subscribers" && <SubscriberSection subscribers={subscribers} pendingCount={pendingSubscribers.length} actionId={subscriberActionId} onDecision={handleSubscriberDecision} formatTimestamp={formatTimestamp} />}</main></div>;
 }
 
 export default App;
