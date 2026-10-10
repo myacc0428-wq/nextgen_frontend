@@ -3,7 +3,7 @@ import { Film, PlayCircle, Plus, Trash2 } from "lucide-react";
 import "./admin-create-premium.css";
 
 type Episode = { id: string; title?: string; seriesTitle?: string; genre?: string; contentType?: string; thumbnailUrl?: string; isPublished?: boolean };
-type ContentSectionProps = { episodes: Episode[]; genres: string[]; onGenreChange: (id: string, genre: string) => void; onAddDrama?: (name: string, description: string, genre: string, video: File) => Promise<void>; onDeleteDrama?: (id: string) => Promise<void>; onCreateGenre?: (name: string) => Promise<{ name: string }> };
+type ContentSectionProps = { episodes: Episode[]; genres: string[]; onGenreChange: (id: string, genre: string) => Promise<void>; onAddDrama?: (name: string, description: string, genre: string, video: File) => Promise<void>; onDeleteDrama?: (id: string) => Promise<void>; onCreateGenre?: (name: string) => Promise<{ name: string }> };
 
 export default function ContentSection({ episodes, genres, onGenreChange, onAddDrama = async () => {}, onDeleteDrama = async () => {}, onCreateGenre }: ContentSectionProps) {
   const [modalOpen, setModalOpen] = useState(false); const [name, setName] = useState(""); const [description, setDescription] = useState(""); const [genre, setGenre] = useState(""); const [video, setVideo] = useState<File | null>(null); const [saving, setSaving] = useState(false); const [deletingId, setDeletingId] = useState<string | null>(null); const [error, setError] = useState(""); const [newGenre, setNewGenre] = useState(""); const [creatingGenre, setCreatingGenre] = useState(false);
