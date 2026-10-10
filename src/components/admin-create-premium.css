@@ -1,0 +1,205 @@
+.premium-create-hero {
+  padding-right: 34px;
+}
+
+@media (min-width: 781px) {
+  .premium-create-modal {
+    width: min(900px, calc(100vw - 64px));
+  }
+
+  .premium-create-modal form {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 20px;
+    row-gap: 18px;
+  }
+
+  .premium-create-modal form > .premium-field:nth-child(1) {
+    grid-column: 1;
+  }
+
+  .premium-create-modal form > .premium-field:nth-child(2),
+  .premium-create-modal form > .premium-field:nth-child(4),
+  .premium-create-modal form > .premium-field:nth-child(5),
+  .premium-create-modal form > .premium-login-error,
+  .premium-create-modal form > .premium-create-actions {
+    grid-column: 1 / -1;
+  }
+
+  .premium-create-modal form > .premium-field:nth-child(3) {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+
+.premium-create-icon {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+  place-items: center;
+  border: 1px solid rgba(177, 151, 255, 0.35);
+  border-radius: 15px;
+  background: linear-gradient(145deg, rgba(144, 111, 255, 0.32), rgba(65, 193, 255, 0.14));
+  color: #dcd1ff;
+  box-shadow: 0 12px 30px rgba(106, 77, 215, 0.2);
+}
+
+.premium-create-kicker {
+  color: #a995ff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+}
+
+.premium-create-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 24px 0 28px;
+  color: #777e9e;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.premium-create-progress span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.premium-create-progress .active {
+  color: #ece8ff;
+}
+
+.premium-create-progress .active svg {
+  color: #9e83ff;
+}
+
+.premium-create-progress i {
+  height: 1px;
+  min-width: 18px;
+  flex: 1;
+  background: rgba(167, 175, 218, 0.18);
+}
+
+.premium-genre-create {
+  display: flex;
+  gap: 9px;
+}
+
+.premium-genre-create input {
+  flex: 1;
+}
+
+.premium-create-secondary {
+  min-height: 48px;
+  border: 1px solid rgba(171, 177, 221, 0.2);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.055);
+  color: #e0e2f1;
+  padding: 0 15px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 180ms ease;
+}
+
+.premium-create-secondary:hover:not(:disabled),
+.premium-create-secondary:focus-visible {
+  border-color: rgba(177, 151, 255, 0.6);
+  background: rgba(151, 120, 255, 0.14);
+  color: #fff;
+}
+
+.premium-create-secondary:disabled {
+  cursor: wait;
+  opacity: 0.52;
+}
+
+.premium-upload-zone {
+  display: grid;
+  min-height: 152px;
+  box-sizing: border-box;
+  place-items: center;
+  align-content: center;
+  gap: 7px;
+  border: 1px dashed rgba(170, 153, 255, 0.42);
+  border-radius: 17px;
+  background: linear-gradient(145deg, rgba(132, 99, 255, 0.09), rgba(80, 192, 255, 0.035));
+  color: #dfe2f6;
+  text-align: center;
+  cursor: pointer;
+  transition: 180ms ease;
+}
+
+.premium-upload-zone:hover,
+.premium-upload-zone:focus-within,
+.premium-upload-zone.has-file {
+  border-color: #a58cff;
+  background: linear-gradient(145deg, rgba(132, 99, 255, 0.16), rgba(80, 192, 255, 0.07));
+  box-shadow: 0 0 0 4px rgba(142, 105, 255, 0.1);
+}
+
+.premium-upload-zone strong {
+  max-width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.premium-upload-zone small {
+  color: #949dbd;
+}
+
+.premium-upload-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 13px;
+  background: rgba(155, 126, 255, 0.18);
+  color: #cbbcff;
+}
+
+.premium-upload-browse {
+  margin-top: 3px;
+  color: #a895ff;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.premium-upload-zone input[type="file"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.premium-create-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.premium-create-actions .premium-signin-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 164px;
+}
+
+@media (max-width: 560px) {
+  .premium-create-hero { padding-right: 20px; }
+  .premium-create-progress { gap: 6px; font-size: 0.61rem; }
+  .premium-create-progress i { min-width: 8px; }
+  .premium-genre-create,
+  .premium-create-actions { flex-direction: column; }
+  .premium-create-actions .premium-signin-button { width: 100%; }
+}

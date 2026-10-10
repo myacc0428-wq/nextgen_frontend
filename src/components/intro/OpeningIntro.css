@@ -1,0 +1,532 @@
+.cg-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(
+      circle at 50% 45%,
+      rgba(112, 57, 255, .15),
+      transparent 23%
+    ),
+    radial-gradient(
+      circle at 25% 75%,
+      rgba(37, 162, 255, .08),
+      transparent 27%
+    ),
+    radial-gradient(
+      circle at 82% 18%,
+      rgba(185, 65, 255, .10),
+      transparent 25%
+    ),
+    #03040b;
+  animation: cgIntroOut .8s ease 3.55s forwards;
+}
+
+.cg-intro-noise {
+  position: absolute;
+  inset: 0;
+  opacity: .035;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,.18) 0,
+      rgba(255,255,255,.18) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+  mix-blend-mode: overlay;
+}
+
+.cg-intro-orb {
+  position: absolute;
+  width: 45vw;
+  height: 45vw;
+  max-width: 650px;
+  max-height: 650px;
+  border-radius: 50%;
+  filter: blur(75px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cg-intro-orb-one {
+  left: -18vw;
+  bottom: -25vw;
+  background: rgba(69, 105, 255, .14);
+  animation: cgOrbOne 5s ease forwards;
+}
+
+.cg-intro-orb-two {
+  right: -18vw;
+  top: -25vw;
+  background: rgba(168, 65, 255, .16);
+  animation: cgOrbTwo 5s ease forwards;
+}
+
+.cg-intro-center {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.cg-intro-logo-wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 280px;
+  min-height: 150px;
+}
+
+.cg-intro-logo-glow {
+  position: absolute;
+  width: 180px;
+  height: 90px;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(127, 64, 255, .42),
+      rgba(47, 155, 255, .11) 48%,
+      transparent 74%
+    );
+  filter: blur(24px);
+  opacity: 0;
+  transform: scale(.55);
+  animation:
+    cgGlowReveal 1.7s cubic-bezier(.2,.8,.2,1) .35s forwards,
+    cgGlowPulse 2.8s ease-in-out 1.9s infinite;
+}
+
+.cg-intro-logo {
+  position: relative;
+  width: min(320px, 58vw);
+  max-height: 150px;
+  object-fit: contain;
+  opacity: 0;
+  transform: translateY(24px) scale(.72);
+  filter:
+    drop-shadow(0 0 0 rgba(130,78,255,0))
+    drop-shadow(0 0 0 rgba(51,168,255,0));
+  animation:
+    cgLogoReveal 1.6s cubic-bezier(.16,1,.3,1) .25s forwards,
+    cgLogoFloat 3.6s ease-in-out 2s infinite;
+}
+
+.cg-intro-line {
+  position: relative;
+  width: min(230px, 48vw);
+  height: 1px;
+  margin-top: 2px;
+  overflow: hidden;
+  background: rgba(255,255,255,.07);
+}
+
+.cg-intro-line span {
+  position: absolute;
+  left: -100%;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      #8c4dff,
+      #50a9ff,
+      transparent
+    );
+  animation: cgLineSweep 1.45s ease 1.35s forwards;
+}
+
+.cg-intro-tagline {
+  margin: 13px 0 0;
+  color: rgba(205,211,229,.53);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 5px;
+  opacity: 0;
+  animation: cgTextReveal .9s ease 1.7s forwards;
+}
+
+.cg-intro-enter {
+  margin-top: 29px;
+  min-width: 170px;
+  min-height: 43px;
+  padding: 0 23px;
+  border: 1px solid rgba(162,106,255,.38);
+  border-radius: 12px;
+  color: #fff;
+  background:
+    linear-gradient(
+      100deg,
+      rgba(108,53,255,.80),
+      rgba(156,70,255,.63)
+    );
+  box-shadow:
+    0 12px 32px rgba(91,43,255,.18),
+    inset 0 1px 0 rgba(255,255,255,.12);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: cgButtonReveal .9s ease 2.15s forwards;
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    background .2s ease;
+}
+
+.cg-intro-enter:hover {
+  transform: translateY(-2px);
+  background:
+    linear-gradient(
+      100deg,
+      rgba(116,57,255,.96),
+      rgba(168,75,255,.87)
+    );
+  box-shadow:
+    0 15px 38px rgba(91,43,255,.30),
+    0 0 24px rgba(135,68,255,.12);
+}
+
+.cg-intro-rings {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(700px, 95vw);
+  height: min(700px, 95vw);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.cg-intro-rings span {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(132,85,255,.06);
+  border-radius: 50%;
+  transform: scale(.35);
+  opacity: 0;
+}
+
+.cg-intro-rings span:nth-child(1) {
+  animation: cgRingReveal 3.8s ease .1s forwards;
+}
+
+.cg-intro-rings span:nth-child(2) {
+  inset: 10%;
+  animation: cgRingReveal 3.8s ease .4s forwards;
+}
+
+.cg-intro-rings span:nth-child(3) {
+  inset: 22%;
+  border-color: rgba(66,154,255,.075);
+  animation: cgRingReveal 3.8s ease .7s forwards;
+}
+
+.cg-intro-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.cg-intro-particles i {
+  --x: calc((var(--i) * 37) % 100);
+  --y: calc((var(--i) * 61) % 100);
+  --delay: calc((var(--i) % 10) * .12s);
+
+  position: absolute;
+  left: calc(var(--x) * 1%);
+  top: calc(var(--y) * 1%);
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: rgba(188,160,255,.72);
+  box-shadow: 0 0 8px rgba(155,111,255,.5);
+  opacity: 0;
+  animation:
+    cgParticle 3.4s ease var(--delay) infinite;
+}
+
+.cg-intro-corner {
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  opacity: .18;
+}
+
+.cg-intro-corner::before,
+.cg-intro-corner::after {
+  content: "";
+  position: absolute;
+  background: linear-gradient(90deg,#8b4cff,transparent);
+}
+
+.cg-intro-corner::before {
+  width: 45px;
+  height: 1px;
+}
+
+.cg-intro-corner::after {
+  width: 1px;
+  height: 45px;
+}
+
+.cg-intro-corner.top-left {
+  left: 30px;
+  top: 30px;
+}
+
+.cg-intro-corner.top-right {
+  right: 30px;
+  top: 30px;
+  transform: rotate(90deg);
+}
+
+.cg-intro-corner.bottom-left {
+  left: 30px;
+  bottom: 30px;
+  transform: rotate(270deg);
+}
+
+.cg-intro-corner.bottom-right {
+  right: 30px;
+  bottom: 30px;
+  transform: rotate(180deg);
+}
+
+@keyframes cgLogoReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(.72);
+    filter:
+      drop-shadow(0 0 0 rgba(130,78,255,0))
+      drop-shadow(0 0 0 rgba(51,168,255,0));
+  }
+
+  55% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.035);
+    filter:
+      drop-shadow(0 0 24px rgba(130,78,255,.36))
+      drop-shadow(0 0 38px rgba(51,168,255,.14));
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter:
+      drop-shadow(0 0 18px rgba(130,78,255,.26))
+      drop-shadow(0 0 32px rgba(51,168,255,.10));
+  }
+}
+
+@keyframes cgLogoFloat {
+  0%,100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes cgGlowReveal {
+  from {
+    opacity: 0;
+    transform: scale(.55);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes cgGlowPulse {
+  0%,100% {
+    opacity: .62;
+    transform: scale(.96);
+  }
+  50% {
+    opacity: .9;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes cgLineSweep {
+  from {
+    left: -100%;
+  }
+  to {
+    left: 100%;
+  }
+}
+
+@keyframes cgTextReveal {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cgButtonReveal {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cgRingReveal {
+  0% {
+    opacity: 0;
+    transform: scale(.35);
+  }
+  35% {
+    opacity: .7;
+  }
+  100% {
+    opacity: .12;
+    transform: scale(1);
+  }
+}
+
+@keyframes cgParticle {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(.6);
+  }
+
+  25% {
+    opacity: .75;
+  }
+
+  70% {
+    opacity: .25;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-35px) scale(1);
+  }
+}
+
+@keyframes cgOrbOne {
+  from {
+    opacity: 0;
+    transform: scale(.75);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes cgOrbTwo {
+  from {
+    opacity: 0;
+    transform: scale(.70);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes cgIntroOut {
+  0% {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  76% {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  100% {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .cg-intro-logo-wrap {
+    min-width: 230px;
+    min-height: 125px;
+  }
+
+  .cg-intro-logo {
+    width: min(250px, 72vw);
+    max-height: 125px;
+  }
+
+  .cg-intro-tagline {
+    font-size: 8px;
+    letter-spacing: 3px;
+  }
+
+  .cg-intro-enter {
+    margin-top: 24px;
+    min-height: 41px;
+  }
+
+  .cg-intro-corner {
+    transform: scale(.7);
+  }
+
+  .cg-intro-corner.top-right {
+    transform: rotate(90deg) scale(.7);
+  }
+
+  .cg-intro-corner.bottom-left {
+    transform: rotate(270deg) scale(.7);
+  }
+
+  .cg-intro-corner.bottom-right {
+    transform: rotate(180deg) scale(.7);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cg-intro,
+  .cg-intro-logo,
+  .cg-intro-logo-glow,
+  .cg-intro-line span,
+  .cg-intro-tagline,
+  .cg-intro-enter,
+  .cg-intro-rings span,
+  .cg-intro-particles i,
+  .cg-intro-orb {
+    animation: none;
+  }
+
+  .cg-intro {
+    opacity: 1;
+  }
+
+  .cg-intro-logo,
+  .cg-intro-logo-glow,
+  .cg-intro-tagline,
+  .cg-intro-enter {
+    opacity: 1;
+    transform: none;
+  }
+}
+.cg-intro.is-exiting{animation:cgIntroClickExit .42s cubic-bezier(.22,1,.36,1) forwards!important;pointer-events:none!important}.cg-intro.is-exiting .cg-intro-center{transform:scale(.985) translateY(-4px)!important;transition:transform .42s cubic-bezier(.22,1,.36,1)!important}@keyframes cgIntroClickExit{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.985)}}@media(prefers-reduced-motion:reduce){.cg-intro.is-exiting{animation:none!important;opacity:0!important}.cg-intro.is-exiting .cg-intro-center{transition:none!important;transform:none!important}}
+.cg-intro,.cg-intro *,.cg-intro *::before,.cg-intro *::after{user-select:none!important;-webkit-user-select:none!important;-webkit-user-drag:none!important}.cg-intro input,.cg-intro textarea{user-select:text!important;-webkit-user-select:text!important}

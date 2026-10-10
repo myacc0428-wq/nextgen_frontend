@@ -1,0 +1,445 @@
+﻿import { useEffect, useState } from "react";
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+  type User,
+} from "firebase/auth";
+import {
+  collection,
+  doc,
+  onSnapshot,
+  query,
+  serverTimestamp,
+  updateDoc,
+  where,
+} from "firebase/firestore";
+import {
+  Film,
+  RefreshCw,
+  ShieldCheck,
+} from "lucide-react";
+import { auth, db } from "./lib/firebase";
+import CustomerAccessGate from "./components/customer/CustomerAccessGate";
+import OpeningIntro from "./components/intro/OpeningIntro";
+import Sidebar from "./components/Sidebar";
+import DashboardHeader from "./components/DashboardHeader";
+import StatsGrid from "./components/StatsGrid";
+import ContentSection from "./components/ContentSection";
+import SubscriberSection from "./components/SubscriberSection";
+
+type Episode = {
+  id: string;
+  title?: string;
+  seriesTitle?: string;
+  genre?: string;
+  episodeNumber?: number;
+  contentType?: string;
+  thumbnailUrl?: string;
+  isPublished?: boolean;
+  isAdminEntry?: boolean;
+};
+
+type Subscriber = {
+  id: string;
+  email?: string;
+  accountStatus?: string;
+  subscriptionStatus?: string;
+  approvedBy?: string;
+  approvedAt?: any;
+  createdAt?: any;
+  subscriptionRequestedAt?: any;
+};
+
+const GENRES = [
+  "Action",
+  "Adventure",
+  "Comedy",
+  "Drama",
+  "Fantasy",
+  "Horror",
+  "Romance",
+  "Sci-Fi",
+  "Thriller",
+  "Documentary",
+];
+
+function formatTimestamp(value: any) {
+  if (!value) return "—";
+
+  try {
+    if (typeof value.toDate === "function") {
+      return value.toDate().toLocaleString();
+    }
+
+    return new Date(value).toLocaleString();
+  } catch {
+    return "—";
+  }
+}
+
+function App() {
+  const [user, setUser] = useState<User | null>(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [showIntro, setShowIntro] = useState(() =>
+    typeof window !== "undefined" &&
+    sessionStorage.getItem("cinegen_intro_seen") !== "1"
+  );
+  const [adminAllowed, setAdminAllowed] = useState(false);
+  const [episodes, setEpisodes] = useState<Episode[]>([]);
+  const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [subscriberActionId, setSubscriberActionId] = useState<string | null>(
+    null
+  );
+  const [message, setMessage] = useState("");
+  const [activeSection, setActiveSection] = useState<"dashboard" | "content" | "subscribers">("dashboard");
+
+  const navigateTo = (section: "dashboard" | "content" | "subscribers") => {
+    setActiveSection(section);
+
+    const targetId =
+      section === "dashboard"
+        ? "dashboard-section"
+        : section === "content"
+          ? "content-section"
+          : "subscribers-section";
+
+    document.getElementById(targetId)?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
+
+      if (!currentUser) {
+        setAdminAllowed(false);
+        setCheckingAuth(false);
+        return;
+      }
+
+      try {
+        const isAdmin =
+          currentUser.uid === "pxxnt9iRPkVCabOdgjkAGuuTN692";
+
+        console.log("CINEGEN ADMIN CHECK:", {
+          uid: currentUser.uid,
+          email: currentUser.email,
+          isAdmin,
+        });
+
+        if (isAdmin) {
+          setAdminAllowed(true);
+          setLoginError("");
+        } else {
+          setAdminAllowed(false);
+          setLoginError("");
+        }
+      } catch (error) {
+        console.error(error);
+        setAdminAllowed(false);
+        setLoginError("Unable to verify Admin access.");
+      }
+
+      setCheckingAuth(false);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    if (!adminAllowed) {
+      setEpisodes([]);
+      return;
+    }
+
+    const episodesQuery = query(
+      collection(db, "episodes"),
+      where("isAdminEntry", "==", true)
+    );
+
+    const unsubscribe = onSnapshot(
+      episodesQuery,
+      (snapshot) => {
+        const data = snapshot.docs.map((item) => ({
+          id: item.id,
+          ...(item.data() as Omit<Episode, "id">),
+        }));
+
+        setEpisodes(data);
+      },
+      (error) => {
+        console.error(error);
+        setMessage("Unable to load Admin content.");
+      }
+    );
+
+    return unsubscribe;
+  }, [adminAllowed]);
+
+  useEffect(() => {
+    if (!adminAllowed) {
+      setSubscribers([]);
+      return;
+    }
+
+    const unsubscribe = onSnapshot(
+      collection(db, "users"),
+      (snapshot) => {
+        const data = snapshot.docs.map((item) => ({
+          id: item.id,
+          ...(item.data() as Omit<Subscriber, "id">),
+        }));
+
+        setSubscribers(data);
+      },
+      (error) => {
+        console.error(error);
+        setMessage("Unable to load subscribers.");
+      }
+    );
+
+    return unsubscribe;
+  }, [adminAllowed]);
+
+  const handleLogin = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    setLoginError("");
+    setLoading(true);
+
+    try {
+      await signInWithEmailAndPassword(auth, email.trim(), password);
+    } catch (error: any) {
+      console.error(error);
+      setLoginError(
+        error?.code === "auth/invalid-credential"
+          ? "Invalid email or password."
+          : "Login failed. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    setMessage("");
+  };
+
+  const handleGenreChange = async (episodeId: string, genre: string) => {
+    try {
+      await updateDoc(doc(db, "episodes", episodeId), {
+        genre,
+      });
+
+      setMessage(`Genre updated to ${genre}.`);
+      setTimeout(() => setMessage(""), 2500);
+    } catch (error) {
+      console.error(error);
+      setMessage("Failed to update genre.");
+    }
+  };
+
+  const handleSubscriberDecision = async (
+    subscriberId: string,
+    decision: "approve" | "reject"
+  ) => {
+    setSubscriberActionId(subscriberId);
+    setMessage("");
+
+    try {
+      if (decision === "approve") {
+        await updateDoc(doc(db, "users", subscriberId), {
+          accountStatus: "active",
+          subscriptionStatus: "active",
+          approvedAt: serverTimestamp(),
+          approvedBy: user?.email || "Admin",
+        });
+
+        setMessage("Subscriber approved successfully.");
+      } else {
+        await updateDoc(doc(db, "users", subscriberId), {
+          accountStatus: "rejected",
+          subscriptionStatus: "rejected",
+        });
+
+        setMessage("Subscriber rejected.");
+      }
+
+      setTimeout(() => setMessage(""), 3000);
+    } catch (error) {
+      console.error(error);
+      setMessage(
+        decision === "approve"
+          ? "Failed to approve subscriber."
+          : "Failed to reject subscriber."
+      );
+    } finally {
+      setSubscriberActionId(null);
+    }
+  };
+
+  const pendingSubscribers = subscribers.filter(
+    (subscriber) =>
+      subscriber.accountStatus === "pending" ||
+      subscriber.subscriptionStatus === "pending"
+  );
+
+  const activeSubscribers = subscribers.filter(
+    (subscriber) =>
+      subscriber.accountStatus === "active" &&
+      subscriber.subscriptionStatus === "active"
+  );
+
+  if (showIntro) {
+    return (
+      <OpeningIntro
+        onComplete={() => {
+          sessionStorage.setItem("cinegen_intro_seen", "1");
+          setShowIntro(false);
+        }}
+      />
+    );
+  }
+
+  if (checkingAuth) {
+    return (
+      <div className="loading-screen">
+        <div className="loading-card">
+          <RefreshCw size={28} className="spin" />
+          <span>Checking Admin access...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="login-page">
+        <div className="login-panel">
+          <div className="brand-icon">
+            <Film size={32} />
+          </div>
+
+          <div className="brand-text">
+            <h1>CineGen Digital</h1>
+            <p>Web Admin</p>
+          </div>
+
+          <div className="login-divider" />
+
+          <h2>Admin Login</h2>
+          <p className="login-description">
+            Sign in with your CineGen administrator account.
+          </p>
+
+          <form onSubmit={handleLogin}>
+            <label>Email</label>
+            <input
+              type="email"
+              placeholder="admin@example.com"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              required
+            />
+
+            <label>Password</label>
+            <input
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+            />
+
+            {loginError && <div className="error-box">{loginError}</div>}
+
+            <button className="primary-button" type="submit" disabled={loading}>
+              {loading ? "Signing in..." : "Sign in to Admin"}
+            </button>
+          </form>
+
+          <div className="security-note">
+            <ShieldCheck size={17} />
+            <span>Admin access is verified through Firebase.</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  if (user && !adminAllowed) {
+    return <CustomerAccessGate user={user} />;
+  }
+
+  return (
+    <div className="app-shell">
+      <Sidebar
+  activeSection={activeSection}
+  onNavigate={navigateTo}
+  pendingCount={pendingSubscribers.length}
+  userEmail={user?.email}
+  onLogout={handleLogout}
+/>
+
+      <main className="dashboard">
+        <DashboardHeader userEmail={user?.email} />
+
+        {message && <div className="success-box">{message}</div>}
+
+        <StatsGrid
+  totalContent={episodes.length}
+  published={episodes.filter((episode) => episode.isPublished).length}
+  pendingSubscribers={pendingSubscribers.length}
+  activeSubscribers={activeSubscribers.length}
+/>
+
+        <ContentSection
+  episodes={episodes}
+  genres={GENRES}
+  onGenreChange={handleGenreChange}
+/>
+
+        <SubscriberSection
+  subscribers={subscribers}
+  pendingCount={pendingSubscribers.length}
+  actionId={subscriberActionId}
+  onDecision={handleSubscriberDecision}
+  formatTimestamp={formatTimestamp}
+/>
+      </main>
+    </div>
+  );
+}
+
+export default App;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
