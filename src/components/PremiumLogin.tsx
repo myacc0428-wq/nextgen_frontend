@@ -421,6 +421,14 @@ export default function PremiumLogin({
         </section>
       </div>
 
+      <nav className="premium-legal-links" aria-label="CineGen information">
+        <a href="/legal/about">About</a>
+        <a href="/legal/privacy">Privacy</a>
+        <a href="/legal/terms">Terms</a>
+        <a href="/legal/contact">Contact</a>
+        <a href="/legal/faq">FAQ</a>
+      </nav>
+
       {forgotPasswordOpen && (
         <div
           className="premium-create-backdrop"

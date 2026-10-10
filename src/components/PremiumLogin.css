@@ -1808,3 +1808,28 @@ html,body,#root{min-width:320px}.premium-login-scene{width:100%;height:100dvh;mi
 .premium-space-rocket-one {
   display: block !important;
 }
+.premium-legal-links {
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  z-index: 8;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  width: min(92vw, 600px);
+}
+
+.premium-legal-links a {
+  color: rgba(210, 222, 246, .68);
+  font-size: 10px;
+  text-decoration: none;
+  transition: color .2s ease;
+}
+
+.premium-legal-links a:hover,
+.premium-legal-links a:focus-visible {
+  color: #20e7ff;
+}
+

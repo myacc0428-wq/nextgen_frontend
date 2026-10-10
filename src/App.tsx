@@ -2,6 +2,8 @@ import { lazy, useEffect, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import OpeningIntro from "./components/intro/OpeningIntro";
 import PremiumLogin from "./components/PremiumLogin";
+import LegalCenter from "./components/LegalCenter";
+import { isLegalPath, type LegalPageKey } from "./components/legalRoutes";
 import { apiRequest, readSession, writeSession, type ApiUser, type AuthSession, type Drama, type Genre } from "./lib/api";
 const CustomerAccessGate = lazy(() => import("./components/customer/CustomerAccessGate"));
 const DramaPage = lazy(() => import("./components/customer/DramaPage"));
@@ -45,6 +47,7 @@ function App() {
   const handleSubscriberDecision = async (id: string, decision: "approve" | "reject") => { if (decision === "reject" || !session) { setMessage("The backend currently supports approval only."); return; } setSubscriberActionId(id); try { await apiRequest(`/api/auth/users/${id}/subscription`, { method: "PATCH" }, session.accessToken); setMessage("Subscriber approved successfully."); await loadSubscribers(); } catch (error) { setMessage(error instanceof Error ? error.message : "Unable to update subscriber."); } finally { setSubscriberActionId(null); } };
   const pendingSubscribers = subscribers.filter((item) => item.subscriptionStatus === "pending"); const activeSubscribers = subscribers.filter((item) => item.subscriptionStatus === "active");
 
+  if (isLegalPath(pathname)) return <LegalCenter page={pathname.split("/")[2] as LegalPageKey} />;
   if (showIntro) return <OpeningIntro onComplete={() => { sessionStorage.setItem("cinegen_intro_seen", "1"); setShowIntro(false); }} />;
   if (checkingAuth) return <div className="loading-screen"><div className="loading-card"><RefreshCw size={28} className="spin" /><span>Checking CineGen access...</span></div></div>;
   if (!user) return <PremiumLogin loginError={loginError} loading={loading} onSubmit={handleLogin} onForgotPassword={handleForgotPassword} onCreateAccount={handleCreateAccount} />;
