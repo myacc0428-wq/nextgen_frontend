@@ -240,6 +240,7 @@ function CustomerDashboard({
           title: drama.name,
           seriesTitle: drama.name,
           genre: drama.genre,
+          thumbnailUrl: drama.thumbnailUrl,
           videoUrl: drama.url,
           isPublished: true,
         })));
