@@ -15,9 +15,13 @@ export type Drama = {
   genre: string;
   url: string;
   path?: string;
+  thumbnailUrl?: string;
   createdAt: string;
   updatedAt?: string;
 };
+
+export type Review = { id: string; rating: number; comment?: string | null; createdAt: string; user: { name: string } };
+export type ReviewSummary = { reviews: Review[]; averageRating: number; total: number };
 
 export type Genre = {
   id: string;

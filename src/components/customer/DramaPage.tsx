@@ -1,70 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
-import { ArrowLeft, Film, LoaderCircle, Play } from "lucide-react";
-import { apiRequest, type Drama } from "../../lib/api";
+import { ArrowLeft, Film, LoaderCircle, Play, Send, Star } from "lucide-react";
+import { apiRequest, type Drama, type ReviewSummary } from "../../lib/api";
 import "./customer-premium.css";
 import "./DramaPage.css";
 
 type Props = { dramaId: string; accessToken?: string; onBack: () => void };
 
 export default function DramaPage({ dramaId, accessToken, onBack }: Props) {
-  const [drama, setDrama] = useState<Drama | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [drama, setDrama] = useState<Drama | null>(null); const [loading, setLoading] = useState(true); const [error, setError] = useState(""); const [reviewData, setReviewData] = useState<ReviewSummary>({ reviews: [], averageRating: 0, total: 0 }); const [rating, setRating] = useState(0); const [comment, setComment] = useState(""); const [reviewSaving, setReviewSaving] = useState(false); const [reviewMessage, setReviewMessage] = useState(""); const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  useEffect(() => {
-    let active = true;
-    setLoading(true);
-    setError("");
-    void apiRequest<Drama>(`/api/dramas/${encodeURIComponent(dramaId)}`, {}, accessToken)
-      .then((item) => { if (active) setDrama(item); })
-      .catch((cause) => { if (active) setError(cause instanceof Error ? cause.message : "Unable to load this drama."); })
-      .finally(() => { if (active) setLoading(false); });
-    return () => { active = false; };
-  }, [accessToken, dramaId]);
+  useEffect(() => { let active = true; setLoading(true); setError(""); void apiRequest<Drama>(`/api/dramas/${encodeURIComponent(dramaId)}`, {}, accessToken).then((item) => { if (active) setDrama(item); }).catch((cause) => { if (active) setError(cause instanceof Error ? cause.message : "Unable to load this drama."); }).finally(() => { if (active) setLoading(false); }); return () => { active = false; }; }, [accessToken, dramaId]);
+  useEffect(() => { let active = true; void apiRequest<ReviewSummary>(`/api/dramas/${encodeURIComponent(dramaId)}/reviews`).then((data) => { if (active) setReviewData(data); }).catch(() => undefined); return () => { active = false; }; }, [dramaId]);
+  useEffect(() => { const video = videoRef.current; const source = drama?.url?.trim(); if (!video || !source) return; const isHls = /\.m3u8(?:$|\?)/i.test(source); let hls: Hls | null = null; const startAutoplay = () => { video.muted = true; void video.play().catch(() => undefined); }; if (isHls && Hls.isSupported()) { hls = new Hls({ enableWorker: true, lowLatencyMode: false, capLevelToPlayerSize: true }); hls.loadSource(source); hls.attachMedia(video); hls.on(Hls.Events.MANIFEST_PARSED, startAutoplay); } else { video.src = source; video.addEventListener("loadedmetadata", startAutoplay, { once: true }); video.addEventListener("canplay", startAutoplay, { once: true }); } return () => { hls?.destroy(); video.removeEventListener("loadedmetadata", startAutoplay); video.removeEventListener("canplay", startAutoplay); video.pause(); video.removeAttribute("src"); video.load(); }; }, [drama?.url]);
+  const submitReview = async (event: React.FormEvent<HTMLFormElement>) => { event.preventDefault(); if (!accessToken) return setReviewMessage("Please sign in to leave a review."); if (!rating) return setReviewMessage("Choose a rating first."); setReviewSaving(true); setReviewMessage(""); try { const next = await apiRequest<ReviewSummary>(`/api/dramas/${encodeURIComponent(dramaId)}/reviews`, { method: "POST", body: JSON.stringify({ rating, comment }) }, accessToken); setReviewData(next); setComment(""); setReviewMessage("Your review has been saved."); } catch (cause) { setReviewMessage(cause instanceof Error ? cause.message : "Unable to save your review."); } finally { setReviewSaving(false); } };
+  const stars = (value: number, interactive = false) => <span className="cg-rating-stars" aria-label={`${value} out of 5 stars`}>{[1, 2, 3, 4, 5].map((star) => interactive ? <button type="button" key={star} className={star <= value ? "active" : ""} onClick={() => setRating(star)} aria-label={`${star} star${star === 1 ? "" : "s"}`}><Star size={18} fill="currentColor" /></button> : <Star key={star} size={16} fill={star <= value ? "currentColor" : "none"} />)}</span>;
 
-  useEffect(() => {
-    const video = videoRef.current;
-    const source = drama?.url?.trim();
-    if (!video || !source) return;
-
-    const isHls = /\.m3u8(?:$|\?)/i.test(source);
-    let hls: Hls | null = null;
-    const startAutoplay = () => {
-      video.muted = true;
-      void video.play().catch(() => {
-        // Autoplay can still be blocked by the browser; the native controls remain available.
-      });
-    };
-
-    if (isHls && Hls.isSupported()) {
-      hls = new Hls({ enableWorker: true, lowLatencyMode: false, capLevelToPlayerSize: true });
-      hls.loadSource(source);
-      hls.attachMedia(video);
-      hls.on(Hls.Events.MANIFEST_PARSED, startAutoplay);
-    } else {
-      video.src = source;
-      video.addEventListener("loadedmetadata", startAutoplay, { once: true });
-      video.addEventListener("canplay", startAutoplay, { once: true });
-    }
-
-    return () => {
-      hls?.destroy();
-      video.removeEventListener("loadedmetadata", startAutoplay);
-      video.removeEventListener("canplay", startAutoplay);
-      video.pause();
-      video.removeAttribute("src");
-      video.load();
-    };
-  }, [drama?.url]);
-
-  return <main className="cg-shell cg-drama-page">
-    <div className="cg-drama-page-inner">
-      <button type="button" className="cg-drama-back" onClick={onBack}><ArrowLeft size={18} /> Back to CineGen</button>
-      {loading && <div className="cg-page-empty"><LoaderCircle className="gate-spin" size={34} /><p>Loading drama...</p></div>}
-      {!loading && error && <div className="cg-page-empty"><Film size={34} /><h2>Drama unavailable</h2><p>{error}</p><button type="button" className="cg-drama-back" onClick={onBack}>Return to library</button></div>}
-      {!loading && !error && drama && <article className="cg-drama-detail"><div className="cg-drama-video-wrap"><video ref={videoRef} autoPlay muted controls playsInline preload="metadata" controlsList="nodownload" aria-label={drama.name} /></div><div className="cg-drama-copy"><span className="cg-drama-eyebrow">CINEGEN DRAMA</span><h1>{drama.name}</h1><p>{drama.description}</p><button type="button" className="cg-drama-play" onClick={() => { const video = videoRef.current; if (video) { video.muted = false; void video.play(); } }}><Play size={17} fill="currentColor" /> Play with sound</button></div></article>}
-    </div>
-  </main>;
+  return <main className="cg-shell cg-drama-page"><div className="cg-drama-page-inner"><button type="button" className="cg-drama-back" onClick={onBack}><ArrowLeft size={18} /> Back to CineGen</button>{loading && <div className="cg-page-empty"><LoaderCircle className="gate-spin" size={34} /><p>Loading drama...</p></div>}{!loading && error && <div className="cg-page-empty"><Film size={34} /><h2>Drama unavailable</h2><p>{error}</p><button type="button" className="cg-drama-back" onClick={onBack}>Return to library</button></div>}{!loading && !error && drama && <><article className="cg-drama-detail">{drama.thumbnailUrl && <img className="cg-drama-thumbnail" src={drama.thumbnailUrl} alt="" /> }<div className="cg-drama-video-wrap"><video ref={videoRef} autoPlay muted controls playsInline preload="metadata" controlsList="nodownload" aria-label={drama.name} /></div><div className="cg-drama-copy"><span className="cg-drama-eyebrow">CINEGEN DRAMA</span><h1>{drama.name}</h1><p>{drama.description}</p><button type="button" className="cg-drama-play" onClick={() => { const video = videoRef.current; if (video) { video.muted = false; void video.play(); } }}><Play size={17} fill="currentColor" /> Play with sound</button></div></article><section className="cg-reviews" aria-labelledby="reviews-title"><div className="cg-reviews-heading"><div><span className="cg-drama-eyebrow">COMMUNITY</span><h2 id="reviews-title">Reviews & ratings</h2></div><div className="cg-review-summary">{stars(Math.round(reviewData.averageRating))}<strong>{reviewData.averageRating.toFixed(1)}</strong><span>{reviewData.total} review{reviewData.total === 1 ? "" : "s"}</span></div></div><form className="cg-review-form" onSubmit={submitReview}><div><span className="cg-review-label">Your rating</span>{stars(rating, true)}</div><textarea value={comment} onChange={(event) => setComment(event.target.value)} placeholder="Share what you thought about this drama..." maxLength={1000} rows={3} /><div className="cg-review-form-footer"><small>{comment.length}/1000</small><button type="submit" className="cg-drama-play" disabled={reviewSaving}>{reviewSaving ? "Saving..." : <><Send size={15} /> Submit review</>}</button></div>{reviewMessage && <p className="cg-review-message" role="status">{reviewMessage}</p>}</form><div className="cg-review-list">{reviewData.reviews.length === 0 ? <p className="cg-review-empty">Be the first to rate this drama.</p> : reviewData.reviews.map((review) => <article className="cg-review-item" key={review.id}><div className="cg-review-item-top"><strong>{review.user.name}</strong>{stars(review.rating)}<time>{new Date(review.createdAt).toLocaleDateString()}</time></div>{review.comment && <p>{review.comment}</p>}</article>)}</div></section></>}</div></main>;
 }

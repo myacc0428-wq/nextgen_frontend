@@ -9,4 +9,25 @@
 .cg-drama-copy h1 { margin: 8px 0 10px; color: #fff; font-size: clamp(28px, 5vw, 48px); }
 .cg-drama-copy p { max-width: 720px; margin: 0 0 22px; color: #aab2c7; line-height: 1.7; }
 .cg-drama-play { display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 10px; padding: 12px 16px; color: #fff; background: #7438ff; cursor: pointer; font-weight: 700; }
+.cg-drama-thumbnail { display: block; width: 100%; max-height: 280px; object-fit: cover; opacity: .82; }
+.cg-reviews { margin-top: 24px; padding: 28px 34px 34px; border: 1px solid rgba(255,255,255,.08); border-radius: 4px; background: linear-gradient(180deg, #151515 0%, #0b0b0b 100%); }
+.cg-reviews-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.cg-reviews-heading h2 { margin: 8px 0 0; color: #fff; font-size: 26px; }
+.cg-review-summary { display: flex; align-items: center; gap: 8px; color: #9da8bd; }
+.cg-review-summary strong { color: #fff; font-size: 22px; }
+.cg-rating-stars { display: inline-flex; align-items: center; gap: 2px; color: #f6bd4f; }
+.cg-rating-stars button { display: inline-flex; padding: 0; border: 0; color: #526077; background: transparent; cursor: pointer; }
+.cg-rating-stars button.active, .cg-rating-stars button:hover { color: #f6bd4f; }
+.cg-review-form { margin-top: 22px; padding: 18px; border: 1px solid rgba(255,255,255,.08); border-radius: 12px; background: rgba(255,255,255,.03); }
+.cg-review-label { display: block; margin-bottom: 8px; color: #aab2c7; font-size: 12px; font-weight: 700; }
+.cg-review-form textarea { display: block; width: 100%; margin-top: 16px; box-sizing: border-box; border: 1px solid rgba(255,255,255,.12); border-radius: 9px; padding: 12px; color: #fff; background: #090a0e; resize: vertical; font: inherit; }
+.cg-review-form-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; color: #71809a; }
+.cg-review-form-footer button:disabled { opacity: .6; cursor: wait; }
+.cg-review-message { margin: 10px 0 0; color: #a98bff; font-size: 13px; }
+.cg-review-list { margin-top: 20px; }
+.cg-review-item { padding: 16px 0; border-top: 1px solid rgba(255,255,255,.08); }
+.cg-review-item-top { display: flex; align-items: center; gap: 10px; color: #fff; }
+.cg-review-item-top time { margin-left: auto; color: #71809a; font-size: 12px; }
+.cg-review-item p { margin: 9px 0 0; color: #aab2c7; line-height: 1.6; }
+.cg-review-empty { color: #8b96aa; }
 @media (max-width: 640px) { .cg-drama-page-inner { width: calc(100% - 24px); padding-top: 18px; } .cg-drama-copy { padding: 20px; } .cg-drama-video-wrap { aspect-ratio: 16 / 10; } }
