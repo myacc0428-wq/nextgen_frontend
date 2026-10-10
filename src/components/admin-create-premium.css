@@ -2,6 +2,11 @@
   padding-right: 34px;
 }
 
+/* The dialog is rendered inside the content card; let its fixed backdrop escape the card bounds. */
+.cinegen-content-section {
+  overflow: visible;
+}
+
 @media (min-width: 781px) {
   .premium-create-modal {
     width: min(900px, calc(100vw - 64px));
