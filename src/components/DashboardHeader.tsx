@@ -47,11 +47,6 @@ export default function DashboardHeader({
             <span>{userEmail || "Administrator"}</span>
           </div>
         </div>
-
-        <div className="status-pill">
-          <span className="status-dot" />
-          Firebase Connected
-        </div>
       </div>
     </header>
   );
