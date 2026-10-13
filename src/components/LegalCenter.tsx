@@ -1,4 +1,5 @@
-import { ArrowLeft, Check, Mail, ShieldCheck } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, Check, Mail, Menu, ShieldCheck, X } from "lucide-react";
 import "./LegalCenter.css";
 import type { LegalPageKey } from "./legalRoutes";
 
@@ -107,17 +108,25 @@ const goTo = (path: string) => {
 export default function LegalCenter({ page }: { page: LegalPageKey }) {
   const content = pages[page];
   const isContact = page === "contact";
+  const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = (path: string) => {
+    setMenuOpen(false);
+    goTo(path);
+  };
 
   return (
     <main className="legal-shell">
       <header className="legal-header">
-        <button type="button" className="legal-brand" onClick={() => goTo("/")} aria-label="Return to CineGen sign in">
+        <button type="button" className="legal-brand" onClick={() => navigate("/")} aria-label="Return to CineGen sign in">
           <img src="/images/cinegen-logo.png" alt="CineGen Digital" />
         </button>
-        <nav className="legal-nav" aria-label="Legal pages">
-          {navItems.map((item) => <button type="button" className={item.key === page ? "active" : ""} key={item.key} onClick={() => goTo(`/legal/${item.key}`)}>{item.label}</button>)}
+        <button type="button" className="legal-menu-toggle" aria-controls="legal-pages-nav" aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)}>
+          {menuOpen ? <X size={17} /> : <Menu size={17} />}<span>{menuOpen ? "Close" : "Menu"}</span>
+        </button>
+        <nav id="legal-pages-nav" className={`legal-nav${menuOpen ? " open" : ""}`} aria-label="Information pages">
+          {navItems.map((item) => <button type="button" className={item.key === page ? "active" : ""} aria-current={item.key === page ? "page" : undefined} key={item.key} onClick={() => navigate(`/legal/${item.key}`)}>{item.label}</button>)}
         </nav>
-        <button type="button" className="legal-return" onClick={() => goTo("/")}><ArrowLeft size={16} /> Sign in</button>
+        <button type="button" className="legal-return" onClick={() => navigate("/")}><ArrowLeft size={16} /> Sign in</button>
       </header>
 
       <section className="legal-hero" aria-labelledby="legal-page-title">

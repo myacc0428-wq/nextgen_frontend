@@ -1833,3 +1833,94 @@ html,body,#root{min-width:320px}.premium-login-scene{width:100%;height:100dvh;mi
   color: #20e7ff;
 }
 
+
+/* Create Account modal layout and viewport containment. */
+.premium-create-backdrop {
+  box-sizing: border-box;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.premium-create-modal {
+  box-sizing: border-box;
+  width: min(740px, 100%);
+  max-width: 740px;
+  max-height: calc(100dvh - 48px);
+  margin: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 32px;
+  text-align: left;
+  overscroll-behavior: contain;
+}
+
+.premium-create-modal h2,
+.premium-create-modal > p {
+  padding-right: 42px;
+}
+
+.premium-create-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px 18px;
+  min-width: 0;
+}
+
+.premium-create-form .premium-field,
+.premium-create-form .premium-login-error,
+.premium-create-form .premium-create-submit {
+  min-width: 0;
+}
+
+.premium-create-email-field,
+.premium-create-form .premium-create-field-error,
+.premium-create-form > .premium-login-error,
+.premium-create-submit {
+  grid-column: 1 / -1;
+}
+
+.premium-create-form .premium-field {
+  margin-bottom: 0;
+}
+
+.premium-create-field-error {
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
+.premium-create-submit {
+  margin-top: 2px;
+}
+
+@media (max-width: 600px) {
+  .premium-create-backdrop {
+    align-items: start;
+    padding: 12px;
+  }
+
+  .premium-create-modal {
+    width: 100%;
+    max-width: none;
+    max-height: calc(100dvh - 24px);
+    padding: 26px 20px 22px;
+  }
+
+  .premium-create-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .premium-create-password-field,
+  .premium-create-confirm-field,
+  .premium-create-email-field,
+  .premium-create-form .premium-create-field-error,
+  .premium-create-form > .premium-login-error,
+  .premium-create-submit {
+    grid-column: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .premium-create-backdrop {
+    animation: none;
+  }
+}

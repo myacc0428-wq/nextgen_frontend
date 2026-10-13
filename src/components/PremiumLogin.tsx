@@ -1,4 +1,4 @@
-import { useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { X } from "lucide-react";
 import "./PremiumLogin.css";
 
@@ -73,6 +73,7 @@ export default function PremiumLogin({
   const dustHoldTimer = useRef<number | null>(null);
   const dustPressing = useRef(false);
   const [forgotPasswordSuccess, setForgotPasswordSuccess] = useState(false);
+  const createTriggerRef = useRef<HTMLButtonElement | null>(null);
 
   const handleBackgroundPointerDown = (event: PointerEvent<HTMLDivElement>) => {
     const target = event.target as HTMLElement;
@@ -153,6 +154,18 @@ export default function PremiumLogin({
     setActionMessage("");
     setCreateOpen(true);
   };
+  const closeCreateAccount = useCallback(() => {
+    setCreateOpen(false);
+    window.requestAnimationFrame(() => createTriggerRef.current?.focus());
+  }, []);
+  useEffect(() => {
+    if (!createOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closeCreateAccount();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [createOpen, closeCreateAccount]);
   const handleLoginSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     onSubmit(loginEmail, loginPassword);
@@ -411,6 +424,7 @@ export default function PremiumLogin({
                 <button
                   type="button"
                   className="premium-text-button premium-create-button"
+                  ref={createTriggerRef}
                   onClick={openCreateAccount}
                 >
                   Create an account
@@ -516,7 +530,7 @@ export default function PremiumLogin({
           className="premium-create-backdrop"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) {
-              setCreateOpen(false);
+              closeCreateAccount();
             }
           }}
         >
@@ -529,7 +543,7 @@ export default function PremiumLogin({
             <button
               type="button"
               className="premium-create-close"
-              onClick={() => setCreateOpen(false)}
+              onClick={closeCreateAccount}
               aria-label="Close create account"
             >
               <X size={18} />
@@ -546,8 +560,8 @@ export default function PremiumLogin({
               Admin approval is required before streaming.
             </p>
 
-            <form onSubmit={handleCreateSubmit}>
-              <div className="premium-field">
+            <form className="premium-create-form" onSubmit={handleCreateSubmit}>
+              <div className="premium-field premium-create-email-field">
                 <label htmlFor="create-email">Email address</label>
                 <input
                   id="create-email"
@@ -558,11 +572,12 @@ export default function PremiumLogin({
                     setCreateEmail(event.target.value)
                   }
                   autoComplete="email"
+                  autoFocus
                   required
                 />
               </div>
 
-              <div className="premium-field">
+              <div className="premium-field premium-create-password-field">
                 <label htmlFor="create-password">Password</label>
                 <input
                   id="create-password"
@@ -578,7 +593,7 @@ export default function PremiumLogin({
                 />
               </div>
 
-              <div className="premium-field">
+              <div className="premium-field premium-create-confirm-field">
                 <label htmlFor="create-confirm">
                   Confirm password
                 </label>
@@ -594,9 +609,14 @@ export default function PremiumLogin({
                   minLength={6}
                   required
                 />
+                {actionMessage === "Passwords do not match." && (
+                  <div className="premium-login-error premium-create-field-error" role="alert">
+                    {actionMessage}
+                  </div>
+                )}
               </div>
 
-              {actionMessage && (
+              {actionMessage && actionMessage !== "Passwords do not match." && (
                 <div
                   className={
                     actionSuccess
@@ -615,7 +635,7 @@ export default function PremiumLogin({
               >
                 {actionLoading
                   ? "Creating Account..."
-                  : "Create Account ?"}
+                  : "Create Account"}
               </button>
             </form>
           </section>
